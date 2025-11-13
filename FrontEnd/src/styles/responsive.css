@@ -1,0 +1,145 @@
+/* Global Responsive Variables and Utilities */
+
+:root {
+  /* Breakpoints */
+  --mobile: 480px;
+  --tablet: 768px;
+  --desktop: 1024px;
+  --large-desktop: 1400px;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* Container padding */
+  --container-padding-mobile: 10px;
+  --container-padding-tablet: 20px;
+  --container-padding-desktop: 30px;
+
+  /* Grid gaps */
+  --grid-gap-mobile: 10px;
+  --grid-gap-tablet: 15px;
+  --grid-gap-desktop: 20px;
+
+  /* Font sizes */
+  --font-xs: 10px;
+  --font-sm: 12px;
+  --font-md: 14px;
+  --font-lg: 16px;
+  --font-xl: 18px;
+  --font-2xl: 24px;
+
+  /* Card padding */
+  --card-padding-mobile: 12px;
+  --card-padding-tablet: 16px;
+  --card-padding-desktop: 20px;
+}
+
+/* Responsive Container Utilities */
+.container-responsive {
+  padding: var(--container-padding-desktop);
+}
+
+.grid-responsive {
+  gap: var(--grid-gap-desktop);
+}
+
+.card-responsive {
+  padding: var(--card-padding-desktop);
+}
+
+/* Media Query Utilities */
+@media (max-width: 1024px) {
+  .container-responsive {
+    padding: var(--container-padding-tablet);
+  }
+  
+  .grid-responsive {
+    gap: var(--grid-gap-tablet);
+  }
+  
+  .card-responsive {
+    padding: var(--card-padding-tablet);
+  }
+}
+
+@media (max-width: 768px) {
+  .container-responsive {
+    padding: var(--container-padding-mobile);
+  }
+  
+  .grid-responsive {
+    gap: var(--grid-gap-mobile);
+  }
+  
+  .card-responsive {
+    padding: var(--card-padding-mobile);
+  }
+}
+
+/* Hide/Show utilities for different screen sizes */
+.mobile-only {
+  display: none;
+}
+
+.tablet-up {
+  display: block;
+}
+
+.desktop-up {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .mobile-only {
+    display: block;
+  }
+  
+  .tablet-up {
+    display: none;
+  }
+  
+  .desktop-up {
+    display: none;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .desktop-up {
+    display: none;
+  }
+}
+
+/* Responsive Text */
+.text-responsive {
+  font-size: var(--font-lg);
+}
+
+@media (max-width: 768px) {
+  .text-responsive {
+    font-size: var(--font-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .text-responsive {
+    font-size: var(--font-sm);
+  }
+}
+
+/* Responsive Flexbox */
+.flex-responsive {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+  .flex-responsive {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+}

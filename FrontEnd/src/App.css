@@ -1,0 +1,182 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8fafc;
+  overflow-x: hidden;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+.App {
+  height: 100vh;
+  height: -webkit-fill-available;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+  height: -webkit-fill-available;
+  flex: 1;
+  transition: all 0.3s ease;
+}
+
+.app-container.simple-layout {
+  flex-direction: column;
+}
+
+.app-container.sidebar-collapsed .main-content {
+  margin-left: 0;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0; /* Prevents flex items from overflowing */
+}
+
+.main-content.full-width {
+  width: 100%;
+  margin-left: 0;
+  padding: 0;
+}
+
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 18px;
+  color: #6b7280;
+  background: white;
+  margin: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .app-container {
+    touch-action: manipulation;
+  }
+  
+  button, .clickable {
+    touch-action: manipulation;
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Foldable Device Support */
+@media (max-width: 280px) {
+  .app-container {
+    flex-direction: column;
+  }
+  
+  .main-content {
+    min-height: 200px;
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: row; /* Keep sidebar behavior */
+  }
+  
+  .App {
+    height: 100vh;
+    height: -webkit-fill-available;
+    overflow: hidden;
+  }
+  
+  .content-area {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .placeholder {
+    margin: 10px;
+    font-size: 16px;
+    min-height: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .placeholder {
+    margin: 5px;
+    font-size: 14px;
+    padding: 15px;
+  }
+  
+  .main-content {
+    min-width: 100vw;
+  }
+}
+
+/* Ultra-wide screens */
+@media (min-width: 2560px) {
+  .app-container {
+    max-width: 2400px;
+    margin: 0 auto;
+  }
+}
+
+/* High DPI screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .app-container {
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+/* Landscape mobile specific */
+@media (max-height: 500px) and (orientation: landscape) {
+  .app-container {
+    height: 100vh;
+  }
+  
+  .content-area {
+    height: calc(100vh - 60px);
+  }
+}
+
+/* iPad Pro specific */
+@media only screen and (min-device-width: 1024px) and (max-device-width: 1366px) and (-webkit-min-device-pixel-ratio: 2) {
+  .app-container {
+    font-size: 18px;
+  }
+}
+
+/* Surface and similar 2-in-1 devices */
+@media (pointer: fine) and (hover: hover) and (max-width: 1366px) {
+  .app-container {
+    font-size: 14px;
+  }
+}
