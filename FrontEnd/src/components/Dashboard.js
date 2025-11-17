@@ -5,7 +5,7 @@ import { useSensorData, useSystemStatus } from '../hooks/useApiData';
 import LoadingSpinner from './LoadingSpinner';
 import './Dashboard.css';
 
-const Dashboard = () => {
+const Dashboard = ({ user, onLogout }) => {
   const { data: sensorData, loading, error, lastUpdate } = useSensorData();
   const { alerts } = useSystemStatus();
   const [showTimerPopup, setShowTimerPopup] = useState(false);
@@ -15,6 +15,7 @@ const Dashboard = () => {
   const [countdown, setCountdown] = useState(0);
   const [isCountdownActive, setIsCountdownActive] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
   // Function to show colored notifications
   const showNotification = (message, type = 'info', duration = 5000) => {
@@ -22,6 +23,33 @@ const Dashboard = () => {
     setTimeout(() => {
       setNotification(null);
     }, duration);
+  };
+
+  // Update current date/time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Format date and time for header
+  const formatDateTime = (date) => {
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+
+    const dayName = days[date.getDay()];
+    const day = date.getDate();
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+    return `${dayName}, ${day} ${month} ${year} pukul ${hours}:${minutes}`;
   };
 
   // Countdown timer effect
@@ -119,39 +147,133 @@ const Dashboard = () => {
     );
   }
 
-  // Buat metrics dari data sensor real
+  // Function to get status based on sensor values
+  const getSensorStatus = (type, value) => {
+    const thresholds = {
+      temperature: { low: 15, optimal: [20, 30], high: 35 },
+      soilMoisture: { low: 30, optimal: [40, 70], high: 80 },
+      humidity: { low: 40, optimal: [50, 70], high: 80 }
+    };
+
+    const threshold = thresholds[type];
+    if (!threshold) return { 
+      status: 'normal', 
+      message: 'Normal', 
+      description: 'Kondisi normal',
+      color: '#6b7280', 
+      icon: '🔵' 
+    };
+
+    if (value < threshold.low) {
+      let message, description;
+      if (type === 'temperature') {
+        message = 'Terlalu Dingin';
+        description = 'Suhu terlalu rendah untuk pertumbuhan optimal';
+      } else if (type === 'soilMoisture') {
+        message = 'Terlalu Kering';
+        description = 'Tanah membutuhkan penyiraman segera';
+      } else {
+        message = 'Terlalu Rendah';
+        description = 'Kelembaban udara kurang untuk tanaman';
+      }
+      return {
+        status: 'low',
+        message,
+        description,
+        color: '#3b82f6',
+        icon: '🔵'
+      };
+    } else if (value > threshold.high) {
+      let message, description;
+      if (type === 'temperature') {
+        message = 'Terlalu Panas';
+        description = 'Suhu terlalu tinggi, butuh pendinginan';
+      } else if (type === 'soilMoisture') {
+        message = 'Terlalu Basah';
+        description = 'Risiko pembusukan akar, kurangi penyiraman';
+      } else {
+        message = 'Terlalu Tinggi';
+        description = 'Kelembaban berlebih, perlu ventilasi';
+      }
+      return {
+        status: 'high', 
+        message,
+        description,
+        color: '#dc2626',
+        icon: '🔴'
+      };
+    } else if (value >= threshold.optimal[0] && value <= threshold.optimal[1]) {
+      let description;
+      if (type === 'temperature') {
+        description = 'Suhu ideal untuk pertumbuhan tanaman';
+      } else if (type === 'soilMoisture') {
+        description = 'Kelembaban tanah sempurna';
+      } else {
+        description = 'Kelembaban udara ideal';
+      }
+      return {
+        status: 'optimal',
+        message: 'Optimal',
+        description,
+        color: '#10b981',
+        icon: '🟢'
+      };
+    } else {
+      let description;
+      if (type === 'temperature') {
+        description = 'Suhu dalam batas wajar';
+      } else if (type === 'soilMoisture') {
+        description = 'Kelembaban tanah cukup baik';
+      } else {
+        description = 'Kelembaban udara cukup baik';
+      }
+      return {
+        status: 'stable',
+        message: 'Stabil',
+        description,
+        color: '#f59e0b',
+        icon: '🟡'
+      };
+    }
+  };
+
+  // Buat metrics dari data sensor real dengan status
   const metrics = sensorData ? [
     {
       title: "Suhu",
       value: sensorData.temperature?.toFixed(1) || "0",
       unit: "°C",
-      subtitle: "Suhu Lingkungan",
       color: "orange",
-      trend: { color: "#f59e0b" }
+      trend: { color: "#f59e0b" },
+      status: getSensorStatus('temperature', sensorData.temperature || 0)
     },
     {
       title: "Kelembaban Tanah",
       value: sensorData.soilMoisture?.toFixed(1) || "0",
       unit: "%",
-      subtitle: "Kelembaban Tanah",
       color: "green",
-      trend: { color: "#10b981" }
+      trend: { color: "#10b981" },
+      status: getSensorStatus('soilMoisture', sensorData.soilMoisture || 0)
     },
     {
       title: "Kelembaban Udara",
       value: sensorData.humidity?.toFixed(1) || "0",
       unit: "%",
-      subtitle: "Kelembaban Udara",
       color: "purple",
-      trend: { color: "#8b5cf6" }
+      trend: { color: "#8b5cf6" },
+      status: getSensorStatus('humidity', sensorData.humidity || 0)
     },
     {
       title: "Status Pompa",
       value: pumpStatus === 'Hidup' ? "ON" : "OFF",
       unit: "",
-      subtitle: pumpMode === 'off' ? 'Tidak Aktif' : pumpMode === 'auto' ? 'Mode Otomatis' : 'Mode Manual',
+
       color: pumpStatus === 'Hidup' ? "blue" : "gray",
-      trend: { color: pumpStatus === 'Hidup' ? "#3b82f6" : "#6b7280" }
+      trend: { color: pumpStatus === 'Hidup' ? "#3b82f6" : "#6b7280" },
+      pumpStatus: {
+        mode: pumpMode === 'off' ? 'Mode Tidak Aktif' : pumpMode === 'auto' ? 'Mode Otomatis' : 'Mode Manual',
+        isOn: pumpStatus === 'Hidup'
+      }
     }
   ] : [];
 
@@ -165,11 +287,16 @@ const Dashboard = () => {
           <div className="header-title">
             <h1>Monitoring</h1>
             <div className="header-time">
-              Rabu, 12 November 2025 pukul 14:34
+              {formatDateTime(currentDateTime)}
             </div>
           </div>
           <div className="header-actions">
-            <div className="logout-icon" title="Logout">
+            <div 
+              className="logout-icon" 
+              title="Logout"
+              onClick={onLogout}
+              style={{ cursor: 'pointer' }}
+            >
               ⤷
             </div>
           </div>
